@@ -464,7 +464,9 @@ async def document_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         )
 
     except Exception:
-        logger.exception("Failed to process document for message_id=%s", message.message_id)
+        logger.exception(
+            "Failed to process document for message_id=%s", message.message_id
+        )
         await message.reply_text(
             "An error occurred while processing your document. "
             "Please check the logs for details."
@@ -512,7 +514,9 @@ async def photo_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
         # Step 3: Caption text for AI analysis
         caption_text = message.caption or ""
         if caption_text:
-            ai_result = await asyncio.to_thread(analyze_content, caption_text, content_type)
+            ai_result = await asyncio.to_thread(
+                analyze_content, caption_text, content_type
+            )
         else:
             ai_result = {
                 "tags": ["image"],
@@ -562,7 +566,9 @@ async def photo_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
         )
 
     except Exception:
-        logger.exception("Failed to process photo for message_id=%s", message.message_id)
+        logger.exception(
+            "Failed to process photo for message_id=%s", message.message_id
+        )
         await message.reply_text(
             "An error occurred while processing your image. "
             "Please check the logs for details."
@@ -622,7 +628,9 @@ async def _handle_link(update, message, text, url):
             combined_text = f"URL: {url}\n\n{extracted}"
         else:
             combined_text = f"URL: {url}\n\n{text}"
-        ai_result = await asyncio.to_thread(analyze_content, combined_text, content_type)
+        ai_result = await asyncio.to_thread(
+            analyze_content, combined_text, content_type
+        )
 
         # Step 4: Store metadata
         db_item = await asyncio.to_thread(
