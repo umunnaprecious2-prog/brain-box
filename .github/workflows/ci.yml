@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Lint with ruff
+        run: ruff check app/ tests/
+
+      - name: Check formatting with black
+        run: black --check app/ tests/
+
+      - name: Run tests
+        env:
+          TELEGRAM_BOT_TOKEN: test-token
+          TELEGRAM_ALLOWED_USER_ID: "12345"
+          OPENAI_API_KEY: test-key
+          STORAGE_BASE_PATH: ./test_storage
+          DATABASE_URL: sqlite:///test_storage/test.db
+          ENVIRONMENT: test
+          GITHUB_TOKEN: test-github-token
+          GITHUB_DEFAULT_REPO: test-owner/test-repo
+        run: pytest tests/ -v
